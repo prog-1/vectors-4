@@ -40,8 +40,6 @@ func NewLine(x1, y1, x2, y2 float64) *Line {
 
 func Draw(img *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 	ebitenutil.DrawLine(img, x1, y1, x2, y2, c)
-	ebitenutil.DrawLine(img, x2, y2, x2+30, y2+40, c)
-	ebitenutil.DrawLine(img, x2-40, y2+40, x2+30, y2+40, c)
 }
 
 func (l *Line) Update() {
