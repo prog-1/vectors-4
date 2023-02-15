@@ -19,15 +19,14 @@ type line struct {
 	a, b vector
 }
 
-func (l *line) rotate(rad float64) {
-	x1, y1 := rotate(l.b.x-l.a.x, l.b.y-l.a.y, rad)
-	l.b = vector{x1 + l.a.x, y1 + l.a.y}
+func (l *line) draw(screen *ebiten.Image) {
+	ebitenutil.DrawLine(screen, l.a.x, l.a.y, l.b.x, l.b.y, color.RGBA{200, 250, 200, 250})
 }
 
-func rotate(x, y, rad float64) (x1, y1 float64) {
-	x1 = x*math.Cos(rad) - y*math.Sin(rad)
-	y1 = y*math.Cos(rad) + x*math.Sin(rad)
-	return x1, y1
+func rotate(l *line, rad float64) *vector {
+	x, y := l.b.x-l.a.x, l.b.y-l.a.y
+	x, y = x*math.Cos(rad)-y*math.Sin(rad), y*math.Cos(rad)+x*math.Sin(rad)
+	return &vector{x + l.a.x, y + l.a.y}
 }
 
 const (
@@ -36,25 +35,39 @@ const (
 )
 
 type game struct {
-	l line
+	p []*vector
 }
 
 func (g *game) Layout(outWidth, outHeight int) (w, h int) { return screenWidth, screenHeight }
 func (g *game) Update() error {
-	g.l.rotate(math.Pi / 180)
+	for i := range g.p {
+		g.p[i] = rotate(&line{*g.p[0], *g.p[i]}, math.Pi/180)
+	}
 	return nil
 }
 func (g *game) Draw(screen *ebiten.Image) {
-	ebitenutil.DrawLine(screen, g.l.a.x, g.l.a.y, g.l.b.x, g.l.b.y, color.RGBA{200, 250, 200, 250})
+	for i := 1; i < len(g.p); i++ {
+		ebitenutil.DrawLine(screen, g.p[i-1].x, g.p[i-1].y, g.p[i].x, g.p[i].y, color.RGBA{200, 250, 200, 250})
+	}
+}
+
+func NewGame() *game {
+	return &game{
+		[]*vector{
+			{screenWidth / 2, screenHeight / 2},
+			{screenWidth / 2, screenHeight / 4},
+			{screenWidth / 4 * 3, screenHeight / 4},
+			{screenWidth / 4 * 3, screenHeight / 8 * 3},
+			{screenWidth / 2, screenHeight / 8 * 3},
+		},
+	}
 }
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	ebiten.SetWindowSize(screenWidth, screenHeight)
-	g := &game{}
-	g.l = line{vector{screenWidth / 2, screenHeight / 2}, vector{screenWidth / 4 * 2, screenHeight / 4}}
 
-	if err := ebiten.RunGame(g); err != nil {
+	if err := ebiten.RunGame(NewGame()); err != nil {
 		log.Fatal(err)
 	}
 }
