@@ -22,9 +22,15 @@ func (l *line) draw(screen *ebiten.Image) {
 	DrawLine(screen, l.a.x, l.a.y, l.b.x, l.b.y, color.RGBA{1, 100, 100, 255})
 }
 
-func rotate(x, y int, rad float64) (x1, y1 int) {
-	x1 = int(float64(x)*math.Cos(rad) - float64(y)*math.Sin(rad))
-	y1 = int(float64(y)*math.Cos(rad) - float64(x)*math.Sin(rad))
+func (l *line) rotate(rad float64) {
+	x1, y1 := l.b.x-l.a.x, l.b.y-l.a.y
+	x1, y1 = rotate(float64(x1), float64(y1), rad)
+	l.b = vector{x1 + l.a.x, y1 + l.a.y}
+}
+
+func rotate(x, y, rad float64) (x1, y1 int) {
+	x1 = int(x*math.Cos(rad) - y*math.Sin(rad))
+	y1 = int(y*math.Cos(rad) + x*math.Sin(rad))
 	return x1, y1
 }
 
@@ -40,7 +46,7 @@ type game struct {
 
 func (g *game) Layout(outWidth, outHeight int) (w, h int) { return screenWidth, screenHeight }
 func (g *game) Update() error {
-	g.l.b.x, g.l.b.y = rotate(g.l.b.x, g.l.b.y, math.Pi/180)
+	g.l.rotate(math.Pi / 180)
 	return nil
 }
 func (g *game) Draw(screen *ebiten.Image) {
