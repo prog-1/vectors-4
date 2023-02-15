@@ -17,46 +17,50 @@ const (
 )
 
 type Game struct {
-	width, height    int
-	angle float64
-	l1 *line
+	width, height     int
+	angle             float64
+	a, b, c, d, e, rp point
+	//a-e - flag points, rp - rotation point
 }
 
 type point struct {
 	x, y float64
 }
 
-type line struct {
-	a point//starting point
-	b point//ending point
-}
-
 //---------------------------Update-------------------------------------
 
 func (g *Game) Update() error {
-	g.l1.b.x, g.l1.b.y = rotate(g.l1, g.angle)//rotating first line ending point
+	//flag point rotation
+	g.a.x, g.a.y = rotate(g.rp, g.a, g.angle)
+	g.b.x, g.b.y = rotate(g.rp, g.b, g.angle)
+	g.c.x, g.c.y = rotate(g.rp, g.c, g.angle)
+	g.e.x, g.e.y = rotate(g.rp, g.e, g.angle)
 	return nil
 }
 
 //---------------------------Draw-------------------------------------
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	ebitenutil.DrawLine(screen, g.l1.a.x, g.l1.a.y, g.l1.b.x, g.l1.b.y, color.RGBA{255, 255, 255, 255})
+	ebitenutil.DrawLine(screen, g.a.x, g.a.y, g.b.x, g.b.y, color.RGBA{255, 255, 255, 255})
+	//ebitenutil.DrawLine(screen, g.b.x, g.b.y, g.c.x, g.c.y, color.RGBA{255, 255, 255, 255})//not bug, but feature
+	ebitenutil.DrawLine(screen, g.c.x, g.c.y, g.d.x, g.d.y, color.RGBA{255, 255, 255, 255})
+	ebitenutil.DrawLine(screen, g.a.x, g.a.y, g.e.x, g.e.y, color.RGBA{255, 255, 255, 255})
 }
 
 //-------------------------Functions----------------------------------
 
-func rotate(l *line, angle float64) (newx,newy float64){
-	
-	//moving ending point to top left corner
-	l.b.x, l.b.y = l.b.x-l.a.x, l.b.y-l.a.y
+func rotate(rp, p point, angle float64) (newx, newy float64) {
+	//p - point, rp - rotation point
 
-	//rotating ending point
-	newx = l.b.x*math.Cos(angle) - l.b.y*math.Sin(angle)
-	newy = l.b.x*math.Sin(angle) + l.b.y*math.Cos(angle)
+	//moving point to top left corner
+	p.x, p.y = p.x-rp.x, p.y-rp.y
 
-	//returning ending point that is moved on it's place
-	return newx+l.a.x,newy+l.a.y
+	//rotating point
+	newx = p.x*math.Cos(angle) - p.y*math.Sin(angle)
+	newy = p.x*math.Sin(angle) + p.y*math.Cos(angle)
+
+	//returning point that is moved on it's place
+	return newx + rp.x, newy + rp.y
 }
 
 //---------------------------Main-------------------------------------
@@ -80,15 +84,19 @@ func main() {
 
 func NewGame(width, height int) *Game {
 
-	//All pre-declared stuff is stored here
+	angle := math.Pi / 2 //here should be somewhere 45-90. me sorry :]
 
-	angle := math.Pi/360
-	
-	var l1 line
-	l1.a.x, l1.a.y = (sW/2)-200, (sH/2)
-	l1.b.x, l1.b.y = (sW/2)-200, (sH/2)-100
+	var a, b, c, d, e, rp point
+
+	a.x, a.y = (sW / 2), (sH/2)-100
+	b.x, b.y = (sW/2)+100, (sH/2)-100
+	c.x, c.y = (sW/2)+100, (sH / 2)
+	d.x, d.y = (sW / 2), (sH / 2)
+	e.x, e.y = (sW / 2), (sH/2)+100
+
+	rp.x, rp.y = (sW / 2), (sH / 2)
 
 	//creating and returning game instance
-	return &Game{sW, sH, angle, &l1}
+	return &Game{sW, sH, angle, a, b, c, d, e, rp}
 
 }
