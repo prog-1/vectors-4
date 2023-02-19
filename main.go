@@ -43,10 +43,9 @@ func (g *Game) Layout(outWidth, outHeight int) (w, h int) {
 }
 
 func Rotate(p1 Point, p2 *Point) {
-	var newpos Point
-	newpos.x = (p2.x-p1.x)*math.Cos(math.Pi/180) - (p2.y-p1.y)*math.Sin(math.Pi/180)
-	newpos.y = (p2.x-p1.x)*math.Sin(math.Pi/180) + (p2.y-p1.y)*math.Cos(math.Pi/180)
-	p2.x, p2.y = newpos.x+p1.x, newpos.y+p1.y
+	newpos_x := (p2.x-p1.x)*math.Cos(math.Pi/180) - (p2.y-p1.y)*math.Sin(math.Pi/180)
+	newpos_y := (p2.x-p1.x)*math.Sin(math.Pi/180) + (p2.y-p1.y)*math.Cos(math.Pi/180)
+	p2.x, p2.y = newpos_x+p1.x, newpos_y+p1.y
 }
 
 // Update updates a game state.
