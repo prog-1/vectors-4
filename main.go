@@ -31,10 +31,10 @@ func NewGame(width, height int) *Game {
 		width:  width,
 		height: height,
 		p1:     Point{float64(width) / 2, float64(height) / 2},
-		p2:     Point{430, 130},
-		p3:     Point{490, 185},
-		p4:     Point{460, 215},
-		p5:     Point{400, 160},
+		p2:     Point{float64(width) / 2, 130},
+		p3:     Point{380, 130},
+		p4:     Point{380, 170},
+		p5:     Point{float64(width) / 2, 170},
 	}
 }
 
